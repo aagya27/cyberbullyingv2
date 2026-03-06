@@ -1,0 +1,453 @@
+import { useState } from "react";
+import jsPDF from "jspdf";
+import { Layout } from "@/components/Layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertTriangle, Search, Filter, Eye, FileText, Clock, ExternalLink, ChevronDown, Scan, CheckCircle, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
+
+import { useIncidents, Incident } from "@/hooks/use-incidents";
+import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
+const getSeverityConfig = (severity: string) => {
+  switch (severity) {
+    case "critical": return { bg: "bg-destructive/20", text: "text-destructive", border: "border-destructive/30" };
+    case "high": return { bg: "bg-orange-500/20", text: "text-orange-400", border: "border-orange-500/30" };
+    case "medium": return { bg: "bg-warning/20", text: "text-warning", border: "border-warning/30" };
+    default: return { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" };
+  }
+};
+
+const getStatusConfig = (status: string) => {
+  switch (status) {
+    case "resolved": return { bg: "bg-success/20", text: "text-success", label: "Resolved" };
+    case "reported": return { bg: "bg-primary/20", text: "text-primary", label: "Reported" };
+    default: return { bg: "bg-muted", text: "text-muted-foreground", label: "Pending" };
+  }
+};
+
+const IncidentsPage = () => {
+  const { incidents } = useIncidents();
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [severityFilter, setSeverityFilter] = useState("all");
+  const [platformFilter, setPlatformFilter] = useState("all");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [detailsIncident, setDetailsIncident] = useState<Incident | null>(null);
+
+  const filteredIncidents = incidents.filter(incident => {
+    const matchesSearch = incident.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      incident.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      incident.id.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSeverity = severityFilter === "all" || incident.severity === severityFilter;
+    const matchesPlatform = platformFilter === "all" || incident.platform === platformFilter;
+    return matchesSearch && matchesSeverity && matchesPlatform;
+  });
+
+  const handleViewDetails = (incident: Incident) => {
+    setDetailsIncident(incident);
+  };
+
+  const handleGenerateReport = (incident: Incident) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginX = 16;
+    let y = 20;
+
+    // Brand header band
+    doc.setFillColor(30, 64, 175); // primary-like blue
+    doc.rect(0, 0, pageWidth, 26, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("CyberGuard Incident Report", marginX, 17);
+    doc.setFontSize(9);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth - marginX, 17, { align: "right" });
+
+    // Reset for body
+    y = 36;
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+
+    const label = (text: string) => {
+      doc.setFont("helvetica", "bold");
+      doc.text(text, marginX, y);
+      doc.setFont("helvetica", "normal");
+      y += 5; // move down before writing the field value
+    };
+
+    const addWrappedText = (text: string, offsetY = 0) => {
+      const availableWidth = pageWidth - marginX * 2;
+      const lines = doc.splitTextToSize(text, availableWidth);
+      lines.forEach((line: string) => {
+        if (y > pageHeight - 20) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, marginX, y);
+        y += 6;
+      });
+      y += offsetY;
+    };
+
+    // Metadata block
+    label("Incident ID");
+    addWrappedText(incident.id, 4);
+
+    label("Severity");
+    addWrappedText(incident.severity.toUpperCase(), 4);
+
+    label("Type");
+    addWrappedText(incident.type, 4);
+
+    label("Platform");
+    addWrappedText(incident.platform, 4);
+
+    label("Detected at");
+    addWrappedText(incident.detectedAt, 4);
+
+    label("Confidence");
+    addWrappedText(`${incident.confidence}%`, 4);
+
+    label("Source URL");
+    addWrappedText(incident.sourceUrl || "(not provided)", 8);
+
+    // Content section header
+    doc.setFont("helvetica", "bold");
+    doc.text("Content", marginX, y);
+    y += 6;
+    doc.setDrawColor(209, 213, 219);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 6;
+    doc.setFont("helvetica", "normal");
+
+    // Content body
+    addWrappedText(incident.content);
+
+    // Footer "signature" on each page
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(107, 114, 128);
+      const footerY = pageHeight - 10;
+      doc.text(
+        `Generated by CyberGuard • Signed digitally by ${incident.platform || "CyberGuard"} workspace`,
+        marginX,
+        footerY,
+      );
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth - marginX, footerY, { align: "right" });
+    }
+
+    doc.save(`incident-${incident.id}.pdf`);
+
+    toast({
+      title: "Report downloaded",
+      description: `Saved as incident-${incident.id}.pdf`,
+    });
+  };
+
+  const handleViewSource = (incident: Incident) => {
+    if (incident.sourceUrl) {
+      window.open(incident.sourceUrl, "_blank", "noopener,noreferrer");
+    } else {
+      toast({
+        title: "No source URL",
+        description: "This incident was logged without a reference link.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <Layout>
+      <div className="py-8 animate-fade-in relative z-10 pb-16">
+        <div className="container mx-auto px-4">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary uppercase tracking-widest backdrop-blur-md mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                Incident Log
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tighter text-white text-glow">
+                Detected Threats Repository
+              </h1>
+              <p className="text-sm text-white/50 mt-2 font-medium">
+                Review, manage, and triaged detected cyberbullying payloads across all connected platforms.
+              </p>
+            </div>
+            <Link to="/analyze">
+              <Button size="lg" className="shadow-[0_0_20px_rgba(var(--primary),0.3)] hover:shadow-[0_0_30px_rgba(var(--primary),0.5)] transition-all bg-primary text-primary-foreground font-bold tracking-wide">
+                <Scan className="w-4 h-4 mr-2" />
+                Analyze New Payload
+              </Button>
+            </Link>
+          </div>
+
+          {/* Stats Bar */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="glass-panel-dark rounded-xl p-5 border-white/10 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:opacity-40 transition-opacity">
+                <FileText className="w-8 h-8 text-white" />
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Total Logs</p>
+              <p className="text-2xl font-bold text-white text-glow">{incidents.length}</p>
+            </div>
+            <div className="glass-panel-dark rounded-xl p-5 border-destructive/30 bg-destructive/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:opacity-40 transition-opacity">
+                <AlertTriangle className="w-8 h-8 text-destructive" />
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1 relative z-10">Critical Alerts</p>
+              <p className="text-2xl font-bold text-destructive text-glow relative z-10">
+                {incidents.filter(i => i.severity === "critical").length}
+              </p>
+            </div>
+            <div className="glass-panel-dark rounded-xl p-5 border-primary/30 bg-primary/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:opacity-40 transition-opacity">
+                <Eye className="w-8 h-8 text-primary" />
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1 relative z-10">Action Pending</p>
+              <p className="text-2xl font-bold text-primary text-glow relative z-10">
+                {incidents.filter(i => i.status === "reported").length}
+              </p>
+            </div>
+            <div className="glass-panel-dark rounded-xl p-5 border-success/30 bg-success/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:opacity-40 transition-opacity">
+                <CheckCircle className="w-8 h-8 text-success" />
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1 relative z-10">Resolved</p>
+              <p className="text-2xl font-bold text-success text-glow relative z-10">
+                {incidents.filter(i => i.status === "resolved").length}
+              </p>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="glass-panel-dark rounded-xl border border-white/10 p-4 mb-6 relative z-20">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                  <Input
+                    placeholder="Search incident payloads..."
+                    className="pl-10 bg-black/50 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-primary shadow-inner h-11"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                  <SelectTrigger className="w-[140px] bg-black/50 border-white/10 text-white h-11">
+                    <Filter className="w-4 h-4 mr-2 text-white/50" />
+                    <SelectValue placeholder="Severity" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0a0f18] border-white/10 text-white">
+                    <SelectItem value="all">All Severity</SelectItem>
+                    <SelectItem value="critical">Critical</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={platformFilter} onValueChange={setPlatformFilter}>
+                  <SelectTrigger className="w-[140px] bg-black/50 border-white/10 text-white h-11">
+                    <SelectValue placeholder="Platform" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0a0f18] border-white/10 text-white">
+                    <SelectItem value="all">All Platforms</SelectItem>
+                    <SelectItem value="Twitter">X Signal</SelectItem>
+                    <SelectItem value="Instagram">Instagram</SelectItem>
+                    <SelectItem value="Facebook">Facebook</SelectItem>
+                    <SelectItem value="Reddit">Reddit</SelectItem>
+                    <SelectItem value="YouTube">YouTube</SelectItem>
+                    <SelectItem value="TikTok">TikTok</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Incidents List */}
+          <div className="space-y-4">
+            {filteredIncidents.map((incident) => {
+              const severityConfig = getSeverityConfig(incident.severity);
+              const statusConfig = getStatusConfig(incident.status);
+              const isExpanded = expandedId === incident.id;
+
+              return (
+                <div
+                  key={incident.id}
+                  className="glass-panel-dark rounded-xl border border-white/10 overflow-hidden hover:border-primary/50 transition-colors group"
+                >
+                  <div
+                    className="p-4 cursor-pointer relative"
+                    onClick={() => setExpandedId(isExpanded ? null : incident.id)}
+                  >
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                      <div className="flex items-start gap-4">
+                        <div className={`w-12 h-12 rounded-lg ${severityConfig.bg} border ${severityConfig.border} flex items-center justify-center shadow-inner`}>
+                          <AlertTriangle className={`w-6 h-6 ${severityConfig.text}`} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className="font-mono text-sm text-white/40">{incident.id}</span>
+                            <span className={`px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold ${severityConfig.bg} ${severityConfig.text} border ${severityConfig.border}`}>
+                              {incident.severity}
+                            </span>
+                            <span className={`px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold ${statusConfig.bg} ${statusConfig.text}`}>
+                              {statusConfig.label}
+                            </span>
+                          </div>
+                          <h3 className="font-bold text-white text-base">{incident.type}</h3>
+                          <p className="text-sm text-white/60 line-clamp-1 font-medium">{incident.content}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <div className="text-sm font-semibold text-white/80">{incident.platform}</div>
+                          <div className="flex items-center justify-end gap-1.5 text-[11px] font-mono text-white/40 uppercase tracking-widest mt-1">
+                            <Clock className="w-3.5 h-3.5 text-primary" />
+                            {incident.detectedAt}
+                          </div>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                          <ChevronDown className={`w-4 h-4 text-white/60 group-hover:text-primary transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {isExpanded && (
+                    <div className="px-6 pb-6 pt-4 border-t border-white/10 bg-black/60 backdrop-blur-md">
+                      <div className="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Inference Confidence</p>
+                          <div className="flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/5">
+                            <div className="flex-1 h-2 bg-black rounded-full overflow-hidden shadow-inner">
+                              <div
+                                className="h-full bg-gradient-to-r from-primary to-cyan-400 rounded-full shadow-[0_0_10px_rgba(var(--primary),0.8)]"
+                                style={{ width: `${incident.confidence}%` }}
+                              />
+                            </div>
+                            <span className="text-sm font-mono font-bold text-white">{incident.confidence}%</span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Signal Payload</p>
+                          <p className="text-sm text-white/80 font-mono bg-white/5 p-3 rounded-lg border border-white/5 leading-relaxed italic">
+                            &quot;{incident.content}&quot;
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-3">
+                        <Button variant="default" size="sm" className="bg-white text-black hover:bg-white/90 font-bold" onClick={() => handleViewDetails(incident)}>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Deep Diagnostic
+                        </Button>
+                        <Button variant="outline" size="sm" className="glass-panel-dark text-white hover:bg-white/10 border-white/20" onClick={() => handleGenerateReport(incident)}>
+                          <FileText className="w-4 h-4 mr-2" />
+                          Compile Dossier
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10" onClick={() => handleViewSource(incident)}>
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Trace Source
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {filteredIncidents.length === 0 && (
+            <div className="glass-panel-dark rounded-xl border border-dashed border-white/20 p-12 text-center flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                <AlertTriangle className="w-6 h-6 text-white/20" />
+              </div>
+              <h3 className="font-bold text-lg text-white mb-2 text-glow">Zero Threats Detected</h3>
+              <p className="text-sm text-white/50 font-medium">Adjust your telemetry filters to locate specific payloads.</p>
+            </div>
+          )}
+        </div>
+
+        <Dialog open={!!detailsIncident} onOpenChange={(open) => !open && setDetailsIncident(null)}>
+          <DialogContent className="glass-panel-dark border-white/10 text-white !bg-[#0b101a] sm:max-w-[600px]">
+            {detailsIncident && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold text-glow flex items-center gap-2 border-b border-white/10 pb-4">
+                    <Shield className="w-5 h-5 text-primary" />
+                    Threat Diagnostic Report
+                  </DialogTitle>
+                  <DialogDescription className="text-white/50 pt-2">
+                    Immutable log entry: <span className="font-mono text-xs">{detailsIncident.id}</span>
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 text-sm mt-2">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white/5 p-3 rounded-lg border border-white/10">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Severity Threat Level</p>
+                      <p className={`font-bold uppercase tracking-wider ${detailsIncident.severity === 'critical' ? 'text-destructive text-glow' :
+                        detailsIncident.severity === 'high' ? 'text-orange-400' :
+                          detailsIncident.severity === 'medium' ? 'text-warning' : 'text-success'
+                        }`}>
+                        {detailsIncident.severity}
+                      </p>
+                    </div>
+                    <div className="bg-white/5 p-3 rounded-lg border border-white/10">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Primary Vector</p>
+                      <p className="font-bold text-white">{detailsIncident.type}</p>
+                    </div>
+                    <div className="bg-white/5 p-3 rounded-lg border border-white/10">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Origin Platform</p>
+                      <p className="font-bold text-white">{detailsIncident.platform}</p>
+                    </div>
+                    <div className="bg-white/5 p-3 rounded-lg border border-white/10">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Neural Confidence</p>
+                      <p className="font-mono font-bold text-primary text-glow">{detailsIncident.confidence}%</p>
+                    </div>
+                    <div className="col-span-2 bg-white/5 p-3 rounded-lg border border-white/10">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1 flex items-center gap-1.5"><Clock className="w-3 h-3 text-primary" /> Timestamp Logged</p>
+                      <p className="font-mono text-white/80">{detailsIncident.detectedAt}</p>
+                    </div>
+                    {detailsIncident.sourceUrl && (
+                      <div className="col-span-2 bg-white/5 p-3 rounded-lg border border-white/10">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1 flex items-center gap-1.5"><ExternalLink className="w-3 h-3 text-primary" /> Source Node</p>
+                        <a
+                          href={detailsIncident.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-primary hover:underline font-mono break-all"
+                        >
+                          {detailsIncident.sourceUrl}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                  <div className="pt-4 border-t border-white/10">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">Intercepted Payload Array</p>
+                    <p className="text-sm font-mono italic text-white/80 border border-white/10 rounded-lg p-4 bg-black/60 shadow-inner">
+                      &quot;{detailsIncident.content}&quot;
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
+    </Layout>
+  );
+};
+
+export default IncidentsPage;

@@ -1,0 +1,12 @@
+{
+  "trained_at": "2026-03-06T10:12:31.240529+00:00",
+  "dataset": "jigsaw",
+  "data_path": "../train.csv",
+  "rows_used": 159571,
+  "labels": [
+    "high",
+    "medium",
+    "none"
+  ],
+  "macro_f1": 0.6809858306810312
+}
