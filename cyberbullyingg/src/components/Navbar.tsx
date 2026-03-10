@@ -19,7 +19,7 @@ export const Navbar = ({ className = "" }: { className?: string }) => {
     <nav className={`fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-[12px] border-b border-border/60 ${className}`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+          {}
           <Link to="/" className="flex items-center gap-3">
             <div className="w-10 h-10 gradient-cyber rounded-lg flex items-center justify-center shadow-glow-cyan">
               <Shield className="w-6 h-6 text-primary-foreground" />
@@ -30,7 +30,7 @@ export const Navbar = ({ className = "" }: { className?: string }) => {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
+          {}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <Link
@@ -47,7 +47,7 @@ export const Navbar = ({ className = "" }: { className?: string }) => {
             ))}
           </div>
 
-          {/* Mobile Menu Button */}
+          {}
           <button
             className="md:hidden p-2 text-foreground"
             onClick={() => setIsOpen(!isOpen)}
@@ -56,7 +56,7 @@ export const Navbar = ({ className = "" }: { className?: string }) => {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {}
         {isOpen && (
           <div className="md:hidden py-4 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-2">

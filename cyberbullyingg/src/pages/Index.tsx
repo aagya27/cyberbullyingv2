@@ -13,7 +13,7 @@ const Index = () => {
     <Layout>
       <div className="space-y-8 animate-fade-in relative z-10 pb-16">
 
-        {/* Dashboard Header */}
+        {}
         <section className="space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary uppercase tracking-widest backdrop-blur-md">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -41,7 +41,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Global Stats Row */}
+        {}
         <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div className="glass-panel-dark rounded-2xl p-6 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-40 transition-opacity">
@@ -87,7 +87,7 @@ const Index = () => {
         </section>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
-          {/* Main feature showcase */}
+          {}
           <section className="space-y-6">
             <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest pl-1">
               Platform Architecture
@@ -123,7 +123,7 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Side panel: Live intercept / Next steps */}
+          {}
           <section className="space-y-6">
             <h2 className="text-sm font-bold text-white/50 uppercase tracking-widest pl-1">
               Live Intercept Signal

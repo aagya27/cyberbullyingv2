@@ -41,7 +41,7 @@ const SettingsPage = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* API Settings */}
+          {}
           <TabsContent value="detection">
             <div className="glass-panel-dark rounded-xl border border-white/10 p-6 md:p-8 space-y-8 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">

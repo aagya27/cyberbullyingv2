@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 const Landing = () => {
   return (
     <div className="dark min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
-      {/* Background Image with Blur Overlay */}
+      {}
       <div className="absolute inset-0 z-0">
         <img
           src="/cyberbullying_hero_bg.png"
@@ -21,10 +21,10 @@ const Landing = () => {
         <Navbar className="!bg-background/50 border-white/10" />
 
         <main className="flex-1 pt-24 pb-16">
-          {/* Hero Section */}
+          {}
           <section className="container mx-auto px-4 py-8 sm:py-16 lg:py-24 relative">
 
-            {/* Ambient glowing orbs */}
+            {}
             <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[128px] -translate-y-1/2 pointer-events-none" />
             <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-destructive/15 rounded-full blur-[128px] pointer-events-none" />
 
@@ -74,12 +74,12 @@ const Landing = () => {
                 </div>
               </div>
 
-              {/* Advanced Preview Card */}
+              {}
               <div className="relative animate-slide-up [animation-delay:200ms] perspective-1000 z-10 group">
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-destructive/20 blur-3xl rounded-full opacity-50 group-hover:opacity-70 transition-opacity duration-700" />
                 <div className="glass-panel-dark rounded-2xl p-1 shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-[1.02] hover:rotate-1 border border-white/10 bg-gradient-to-b from-white/5 to-transparent">
                   <div className="bg-black/80 rounded-xl p-6 sm:p-8 backdrop-blur-xl h-full flex flex-col gap-6 relative overflow-hidden">
-                    {/* decorative scanline */}
+                    {}
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent animate-scan" />
 
                     <div className="flex items-center justify-between">
@@ -127,7 +127,7 @@ const Landing = () => {
             </div>
           </section>
 
-          {/* Feature Grid - Glassmorphism style */}
+          {}
           <section className="container mx-auto px-4 py-16 relative z-10">
             <div className="grid gap-6 md:grid-cols-3">
               {[
@@ -163,7 +163,7 @@ const Landing = () => {
             </div>
           </section>
 
-          {/* Workflow Section */}
+          {}
           <section className="relative z-10 py-24 border-y border-white/10 bg-black/40 backdrop-blur-md">
             <div className="container mx-auto px-4">
               <div className="max-w-3xl mx-auto text-center mb-16">
@@ -176,7 +176,7 @@ const Landing = () => {
               </div>
 
               <div className="grid gap-8 md:grid-cols-3 relative">
-                {/* Connecting line for desktop */}
+                {}
                 <div className="hidden md:block absolute top-[45px] left-[15%] right-[15%] h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent z-0" />
 
                 {[
@@ -217,7 +217,7 @@ const Landing = () => {
           </section>
         </main>
 
-        {/* Override Footer styling implicitly by placing it here, or let the parent bg handle it */}
+        {}
         <div className="relative z-10 bg-black/80 backdrop-blur-xl border-t border-white/5">
           <Footer />
         </div>

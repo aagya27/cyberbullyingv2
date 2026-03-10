@@ -7,19 +7,16 @@
 @layer base {
   :root {
     --background: 0 0% 99%;
-    /* Neutral off‑white app bg (less blue) */
-    --foreground: 222 47% 11%;
+        --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    /* Pure white cards */
-    --card-foreground: 222 47% 11%;
+        --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
     --primary: 221 83% 53%;
-    /* Indigo/Blue primary just for accents/buttons */
-    --primary-foreground: 210 40% 98%;
+        --primary-foreground: 210 40% 98%;
 
     --secondary: 0 0% 96%;
     --secondary-foreground: 222 47% 11.2%;
@@ -44,18 +41,15 @@
     --ring: 221 83% 53%;
 
     --radius: 0.5rem;
-    /* Sharper buttons */
-
+    
     --shadow-elevated: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
 
-    /* Brand accents */
-    --cyan: 199 89% 55%;
+        --cyan: 199 89% 55%;
     --cyan-glow: 199 89% 60%;
     --purple: 262 83% 64%;
     --purple-glow: 262 83% 70%;
 
-    /* Subtle gradients for professional feel */
-    --gradient-cyber: linear-gradient(135deg, hsl(221 83% 53%), hsl(262 83% 64%));
+        --gradient-cyber: linear-gradient(135deg, hsl(221 83% 53%), hsl(262 83% 64%));
     --gradient-dark: radial-gradient(circle at top left, hsl(221 83% 12%), hsl(222 84% 5%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 40% 98%));
 
@@ -271,7 +265,6 @@
   }
 }
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

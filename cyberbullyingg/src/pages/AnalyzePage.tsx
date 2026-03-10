@@ -98,12 +98,12 @@ const AnalyzePage = () => {
         categories: evaluation.categories,
         confidence: evaluation.confidence,
         explanation: getExplanation(evaluation.categories, evaluation.confidence),
-        keywords: [] // Backend defines categories directly on the whole text
+        keywords: [] 
       };
 
       setResult(analysisResult);
 
-      // Save to incidents if it's bullying
+      
       if (analysisResult.isBullying) {
         addIncident({
           type: evaluation.categories[0] || "Toxic Content",
@@ -262,7 +262,7 @@ Content Analyzed:
               </div>
             </div>
 
-            {/* OCR Extractor - Dark Mode */}
+            {}
             <div className="glass-panel-dark rounded-xl border border-dashed border-white/20 p-5 space-y-3 relative overflow-hidden group">
               <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative z-10">
@@ -296,7 +296,7 @@ Content Analyzed:
             </div>
           </section>
 
-          {/* Results Section */}
+          {}
           <section className="space-y-4">
             {isAnalyzing && (
               <div className="glass-panel-dark rounded-xl p-10 text-center flex flex-col items-center justify-center min-h-[400px]">
@@ -326,7 +326,7 @@ Content Analyzed:
 
             {result && !isAnalyzing && (
               <div className="glass-panel-dark rounded-2xl overflow-hidden shadow-2xl animate-slide-up border border-white/10 relative">
-                {/* Threat Banner */}
+                {}
                 <div className={`p-6 relative overflow-hidden ${result.isBullying
                   ? "bg-gradient-to-br from-destructive/30 to-destructive/5 border-b border-destructive/30"
                   : "bg-gradient-to-br from-success/30 to-success/5 border-b border-success/30"
@@ -369,7 +369,7 @@ Content Analyzed:
                   </div>
                 </div>
 
-                {/* Threat Details */}
+                {}
                 <div className="p-6 space-y-6 bg-black/40 backdrop-blur-md">
                   {result.categories.length > 0 && (
                     <div>

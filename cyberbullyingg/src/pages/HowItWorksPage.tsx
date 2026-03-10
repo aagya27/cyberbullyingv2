@@ -19,7 +19,7 @@ const HowItWorksPage = () => {
         </div>
 
         <div className="space-y-6 relative">
-          {/* Vertical connecting line */}
+          {}
           <div className="absolute left-8 top-12 bottom-12 w-px bg-gradient-to-b from-primary/50 via-primary/20 to-transparent hidden md:block" />
 
           {[

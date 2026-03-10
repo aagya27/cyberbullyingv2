@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 export interface Incident {
     id: string;
-    type: string; // mapped from categories e.g. "Hate Speech"
+    type: string; 
     severity: "none" | "low" | "medium" | "high" | "critical";
     platform: string;
     content: string;
@@ -17,7 +17,7 @@ const STORAGE_KEY = "cyberguard-incidents";
 export const useIncidents = () => {
     const [incidents, setIncidents] = useState<Incident[]>([]);
 
-    // Load from local storage on mount
+    
     useEffect(() => {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {

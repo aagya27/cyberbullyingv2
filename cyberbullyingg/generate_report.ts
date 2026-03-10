@@ -2,12 +2,12 @@ import * as fs from "fs";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, ImageRun } from "docx";
 
 const createReport = async () => {
-    // Report Content
+    
     const doc = new Document({
         sections: [{
             properties: {},
             children: [
-                // Title Page
+                
                 new Paragraph({
                     text: "PROJECT REPORT ON",
                     heading: HeadingLevel.TITLE,
@@ -68,7 +68,7 @@ const createReport = async () => {
                     spacing: { after: 200 },
                 }),
 
-                // 2. Problem Statement
+                
                 new Paragraph({
                     text: "2. Problem Statement",
                     heading: HeadingLevel.HEADING_1,
@@ -78,7 +78,7 @@ const createReport = async () => {
                     spacing: { after: 200 },
                 }),
 
-                // 3. System Architecture
+                
                 new Paragraph({
                     text: "3. System Architecture",
                     heading: HeadingLevel.HEADING_1,
@@ -96,7 +96,7 @@ const createReport = async () => {
                 new Paragraph({ text: "• Latency: Zero network latency for inference.", bullet: { level: 0 } }),
                 new Paragraph({ text: "• Cost: No expensive backend GPU servers required.", bullet: { level: 0 } }),
 
-                // 4. Technology Stack
+                
                 new Paragraph({
                     text: "4. Technology Stack",
                     heading: HeadingLevel.HEADING_1,
@@ -107,7 +107,7 @@ const createReport = async () => {
                 new Paragraph({ text: "• Styling: Tailwind CSS & Shadcn UI", bullet: { level: 0 } }),
                 new Paragraph({ text: "• Persistence: LocalStorage (Browser Database)", bullet: { level: 0 } }),
 
-                // 5. Implementation Details
+                
                 new Paragraph({
                     text: "5. Implementation Details",
                     heading: HeadingLevel.HEADING_1,
@@ -129,7 +129,7 @@ const createReport = async () => {
                     spacing: { after: 200 },
                 }),
 
-                // 6. Results
+                
                 new Paragraph({
                     text: "6. Results and Verification",
                     heading: HeadingLevel.HEADING_1,
@@ -147,7 +147,7 @@ const createReport = async () => {
                 new Paragraph({ text: "• Incidents are logged and viewable in the Incidents page.", bullet: { level: 0 } }),
 
 
-                // 7. Conclusion
+                
                 new Paragraph({
                     text: "7. Conclusion",
                     heading: HeadingLevel.HEADING_1,

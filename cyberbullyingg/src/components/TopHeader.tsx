@@ -24,7 +24,7 @@ export const TopHeader = () => {
     return (
         <header className="h-16 bg-background border-b border-border/60 flex items-center justify-between px-4 sm:px-6 shrink-0 z-10 sticky top-0">
             <div className="flex items-center gap-4">
-                {/* We'll handle mobile sidebar toggle later if needed, hiding for desktop */}
+                {}
                 <button className="md:hidden text-muted-foreground hover:text-foreground">
                     <Menu className="w-5 h-5" />
                 </button>

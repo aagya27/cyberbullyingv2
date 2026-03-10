@@ -57,8 +57,8 @@ const IncidentsPage = () => {
     const marginX = 16;
     let y = 20;
 
-    // Brand header band
-    doc.setFillColor(30, 64, 175); // primary-like blue
+    
+    doc.setFillColor(30, 64, 175); 
     doc.rect(0, 0, pageWidth, 26, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
@@ -67,7 +67,7 @@ const IncidentsPage = () => {
     doc.setFontSize(9);
     doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth - marginX, 17, { align: "right" });
 
-    // Reset for body
+    
     y = 36;
     doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "normal");
@@ -77,7 +77,7 @@ const IncidentsPage = () => {
       doc.setFont("helvetica", "bold");
       doc.text(text, marginX, y);
       doc.setFont("helvetica", "normal");
-      y += 5; // move down before writing the field value
+      y += 5; 
     };
 
     const addWrappedText = (text: string, offsetY = 0) => {
@@ -94,7 +94,7 @@ const IncidentsPage = () => {
       y += offsetY;
     };
 
-    // Metadata block
+    
     label("Incident ID");
     addWrappedText(incident.id, 4);
 
@@ -116,7 +116,7 @@ const IncidentsPage = () => {
     label("Source URL");
     addWrappedText(incident.sourceUrl || "(not provided)", 8);
 
-    // Content section header
+    
     doc.setFont("helvetica", "bold");
     doc.text("Content", marginX, y);
     y += 6;
@@ -125,10 +125,10 @@ const IncidentsPage = () => {
     y += 6;
     doc.setFont("helvetica", "normal");
 
-    // Content body
+    
     addWrappedText(incident.content);
 
-    // Footer "signature" on each page
+    
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -167,7 +167,7 @@ const IncidentsPage = () => {
     <Layout>
       <div className="py-8 animate-fade-in relative z-10 pb-16">
         <div className="container mx-auto px-4">
-          {/* Header */}
+          {}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary uppercase tracking-widest backdrop-blur-md mb-3">
@@ -189,7 +189,7 @@ const IncidentsPage = () => {
             </Link>
           </div>
 
-          {/* Stats Bar */}
+          {}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div className="glass-panel-dark rounded-xl p-5 border-white/10 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:opacity-40 transition-opacity">
@@ -227,7 +227,7 @@ const IncidentsPage = () => {
             </div>
           </div>
 
-          {/* Filters */}
+          {}
           <div className="glass-panel-dark rounded-xl border border-white/10 p-4 mb-6 relative z-20">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
@@ -274,7 +274,7 @@ const IncidentsPage = () => {
             </div>
           </div>
 
-          {/* Incidents List */}
+          {}
           <div className="space-y-4">
             {filteredIncidents.map((incident) => {
               const severityConfig = getSeverityConfig(incident.severity);

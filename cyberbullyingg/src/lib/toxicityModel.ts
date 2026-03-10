@@ -9,8 +9,8 @@ class ToxicityService {
     private backendUrl: string;
 
     constructor() {
-        // In development we may call a separate backend, in production
-        // (Render single instance) we default to same-origin.
+        
+        
         const envBase = (import.meta as any).env?.VITE_BACKEND_URL as string | undefined;
         const base = envBase && envBase.length > 0 ? envBase : window.location.origin;
         this.backendUrl = `${base.replace(/\/+$/, "")}/predict`;
